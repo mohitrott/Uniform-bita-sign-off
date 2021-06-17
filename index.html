@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniform Circular Motion</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+        integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AdehRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./script.js"></script>
+    <script src="./index.js"></script>
+    <script src="scaling.js"></script>
+    <script src="dashedline.js"></script>
+    <script src="timer.js"></script>
+    <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+
+<body class="disable-dbl-tap-zoom">
+    <div id="wrapper">
+        <div class="container-fluid">
+            <div class="top-show">
+                <img src="./Images/1.png" style="width: 100%; height: auto;" />
+                <div class="top-buttons">
+                    <img class="top-b" src="./Images/intro_Btn.png" onclick="openIntroduction()"
+                        onmouseenter="onHoverIntro()" tabindex="0" role="button" onmouseleave="offHoverIntro()" />
+                    <img class="top-b1" src="./Images/Exercise_Btn.png" tabindex="0" role="button"
+                        onclick="document.location='./S05-e62.doc'" , onmouseenter="onHoverExe()"
+                        onmouseleave="offHoverExe()" />
+                </div>
+            </div>
+
+            <div id="dialogIntro" class="intro-container hideThis">
+                <img class="pop" src="./Images/popup.png" tabindex="0" role="button" onclick="closeIntroduction()">
+                <map name="image-map">
+                    <area target="" alt="" title="" href="" coords="998,62,920,36" shape="rect"
+                        onmouseenter="onHoverpopup()" onmouseleave="offHoverpopup()" style="outline: none;">
+                </map>
+                <img class="intro-image" src="./Images/introduction.png">
+            </div>
+
+
+            <div class="activity___left" id="leftarea">
+                <img src="./Images/Key.png" id="key">
+                <div id="cirArea">
+                    <img id="radius1" src="./Images/dotted_line.svg">
+                    <img id="radius2" src="./Images/dotted_line.svg">
+                    <img id="radius3" src="./Images/dotted_line.svg">
+                    <img id="circle1" src=" ./Images/dot_circle.svg">
+
+                    <img id="circle2" src="./Images/dot_circle.svg">
+                    <img id="circle3" src="./Images/dot_circle.svg">
+
+                </div>
+
+
+                <img id="whiteCircle" src="./Images/grey_point.png">
+                <div class="rotateArea">
+                    <div class="ra">
+
+                        <img id="ball" class="ball" src="./Images/ball.png">
+
+                        <hr id="blackline">
+                        <div id="arrowArea">
+                            <canvas id="canvas" class="can" width="500px" height="500px"></canvas>
+                            <div id="arrow1" class="arrow1">
+                                <div id="line1"></div>
+                                <div id="point1"></div>
+                            </div>
+                            <div id="blueArrow" class="blueArrow">
+                                <div id="bline"></div>
+
+                                <div id="bpoint"></div>
+                            </div>
+
+                            <div id="greenArrow" class="greenArrow">
+                                <div id="gline"></div>
+                                <div id="gpoint"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span id="time"><b>time <i>t=</i></b></span>
+                <b id="stop"><label id="sec" style="
+                margin-left: -6px;
+            ">0</label>.
+                    <p id="milisec">00</p>
+                    <p style="
+               position: absolute;
+               top: 0px;
+               left: 31px;
+           ">s</p>
+                </b>
+
+            </div>
+
+
+        </div>
+        <div class="activity___right">
+            <div class=" item1" >
+                <label><b style="margin-left: 9px">mass <i> m:</i> </b> <span id="massM"> 1 kg </span></label>
+                <br>
+                <input id="slide1" type="range" min="1" max="1.5" step="0.1" value="1.0" class="slider amplitudeSlider"
+                    oninput="selectMass(event)" onchange="sliderbarvalue()" on="calcuFormula()"
+                    ontouchstart="calcuFormula()">
+                <div class="slider___label1">
+                    <spam class="coordinatre" id="">1</spam>
+                    <spam class="coordinatre" id=""></spam>
+                    <spam class="coordinatre" id="">1.5</spam>
+
+                </div>
+             </div>
+                <div class=" item2" >
+                <label id="label2"><b style="margin-left: 9px">radius <i> r:</i> </b> <span id="radiusR"> 2 m </span></label>
+                <input id="radius" type="range" min="1" max="2" step="0.5" value="2" class="slider amplitudeSlider2"
+                    oninput="selectRadius(event)" onchange="sliderbarvalue() " onclick="calcuFormula()"
+                    onclick="calcuFormula()" ontouchstart="calcuFormula()">
+                <div class="slider___label">
+                    <spam>1</spam>
+                    <spam>1.5</spam>
+                    <spam>2</spam>
+
+                </div></div>
+                <div class=" item3" >
+                <label id="label3"><b style="margin-left: 9px">angular velocity <i> &#969;:</i> </b> <span id="ang">
+                        1 rad s<sup>‒1</sup> </span></label>
+                <input id="slide3" type="range" min="-2" max="2" step="1" value="1" class="slider amplitudeSlider2"
+                    oninput="selectAngVelocity(event)" onchange="sliderbarvalue()" ontouchstart="calcuFormula()"
+                    onclick="calcuFormula()">
+                <div class="slider___label3">
+                    <spam class="coordinatre" id="">‒2</spam>
+                    <spam class="coordinatre" id="">0</spam>
+                    <spam class="coordinatre" id="">2</spam>
+
+                </div></div>
+                <div id="checkboxArea">
+                    <label class="container">
+                        <b>show velocity</b>
+                        <input type="checkbox" checked="checked" id="velocityshow" onchange="showvelocity()">
+                        <span class="checkmark" tabindex="0" role="checkbox"></span>
+                    </label>
+                    <label class="container">
+                        <b>show acceleration</b>
+                        <input type="checkbox" id="showAcceleration" onchange="showAcceleration()">
+                        <span class="checkmark" tabindex="0" role="checkbox"></span>
+                    </label>
+                    <label class="container">
+                        <b>show force</b>
+                        <input type="checkbox" onchange="showforce()" id="showforce">
+                        <span class="checkmark" tabindex="0" role="checkbox"></span>
+                    </label>
+                    <label class="container">
+                        <b>show reference lines</b>
+                        <input type="checkbox" tabindex="0" role="checkbox" class="refrence" id="showCircle"
+                            onchange="showCircle()">
+                        <span class="checkmark" tabindex="0" role="checkbox"></span>
+                    </label>
+                </div>
+
+
+
+
+
+
+
+
+                <!--.....-->
+
+                <div class="item" style="
+                display: table-row;
+                
+            ">
+
+
+                    <img class="glow Play " id="play" src="./Images/play_P.png" onclick="startStop()"
+                        onmouseenter="onHoverPlay()" onmouseleave="offHoverPlay()" tabindex="0" role="button">
+                    <img class="glow hideThis pause " id="pause" src="./Images/Paus_btn.png" onclick="pause()"
+                        onmouseenter="onHoverPause()" onmouseleave="offHoverPause()" tabindex="0" role="button">
+                    <img id="reset1" class="glow reset disabledDiv" src="./Images/Rest_btn.png" onclick="reset()"
+                        onmouseenter="onHoverReset()" onmouseleave="offHoverReset()" tabindex="0" role="button">
+                    <img id="remove" class="glow remove disabledDiv" src="./Images/Remov.png"
+                        onmouseenter="onHoverRemove()" onclick="removeF()" onmouseleave="offHoverRemove()" tabindex="0"
+                        role="button">
+
+
+
+                    <hr style="height:1px; width: 322px; border-width:0;background-color:teal">
+                </div>
+                
+        <div class="valueArea">
+                <div id="valueArea1"><b id="angr"
+                        style="position: absolute;margin-left: -3px;"> angular displacement <i>&#952;</i> = </b>
+                        <div id="radArea">
+                            <label id="secR">0</label>
+                            <b style="/* margin-left: 34px; */position: relative;left: 33px;">.</b>
+                             <p id="milisecR">00</p>
+                             <b id="rad">rad</b>
+                        </div>
+
+            </div>
+            <div id="valueArea2"><b id="vel"
+                    style="position: absolute; margin-left: 113px;"> velocity <i>v</i>= </b>
+                <!-- <span style=" margin-left: 223px;" id="velocity"><b> <input type="text" class="vol" value=2.00 disabled="disabled" >ms<sup>-1</sup></b></span>  -->
+                <span style=" margin-left: 223px;" id="velocity"><b> <label class="vol">2.00 m
+                            s<sup>‒1</sup></label></b></span>
+
+            </div>
+            <div id="valueArea3" >
+                <b id="acce"
+                    style="position: absolute;margin-left: 71px;"> acceleration <i>a</i> = </b>
+                <span style=" margin-left: 223px;" id="velocity">
+                    <b><label class="acc">2.00 m s
+                            <!-- <span id=>00</span> -->
+                            <sup>‒2</sup>
+                        </label></b></span>
+            </div>
+            <div id="valueArea4">
+                <b id="force"
+                    style="position: absolute; margin-left: 124px;"> force <i>F</i> = </b>
+                <span style=" margin-left: 223px;" id="velocity"><b><label class="foc">2.00 N</label></b></span>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

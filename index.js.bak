@@ -1,0 +1,1768 @@
+var layout;
+var layout_0;
+var layout_1;
+var saved = false;
+var redDotPlotted = false;
+var displacementValue;
+var newLine = [16, 16, 16, 16, 16];
+var isNotChecked = false;
+var slider;
+var output;
+var sliderNew;
+var sliderNew1;
+var sliderNew2;
+var sliderNew3;
+var sliderNew4;
+var plotY = getY();
+var dropDownValueLable = "uniform motion";
+var dropDownValue = "uniform";
+plotY.set(newLine);
+
+// pinch-to-zoom + double tap
+var doubleTouchStartTimestamp = 0;
+document.addEventListener("touchstart", touchHandler, { passive: false });
+function touchHandler(evt) {
+  var event = evt.originalEvent || evt;
+  var now = +new Date();
+
+  if (doubleTouchStartTimestamp + 500 > now) {
+    //the event is double-tap
+    //you can then prevent the behavior
+    event.preventDefault();
+  }
+  doubleTouchStartTimestamp = now;
+
+  if (event.touches.length > 1) {
+    //the event is multi-touch
+    //you can then prevent the behavior
+    event.preventDefault();
+  }
+}
+
+function initGraph(isOnload = true) {
+  // addRemove();
+  slider = document.getElementById("slide1");
+  output = document.getElementById("velcityValue");
+  $("#bt2").addClass("disabledDiv");
+  $("#drop1").on("hide.bs.dropdown", function (e) {
+    if (e.clickEvent) {
+      e.preventDefault();
+    }
+  });
+
+  $("#drop2").on("hide.bs.dropdown", function (e) {
+    if (e.clickEvent) {
+      e.preventDefault();
+    }
+  });
+
+  if (isOnload) {
+    setDropdownValue("uniform motion", "uniform");
+  }
+
+  layout = {
+    title: {
+      text: "<b>displacement <i>s /</i> m</b>",
+      x: 0.62,
+      xanchor: "right",
+      y: 0.96,
+      yanchor: "top",
+    },
+    showlegend: false,
+
+    paper_bgcolor: "rgba(0,0,0,0)",
+    bordercolor: "rgb(0, 0, 0)",
+    dragmode: false,
+    hovermode: false,
+
+    //plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: {
+      l: 38,
+      r: 20,
+      b: 20,
+      t: 32,
+    },
+    xaxis: {
+      // tickmode: "linear", //  If "linear", the placement of the ticks is determined by a starting position `tick0` and a tick step `dtick`
+      range: [0, 16],
+      margin: {
+        t: 1,
+        r: 1,
+        b: 1,
+        l: 1,
+      },
+      tick0: 0,
+      autotick: false,
+      dtick: 4,
+      zeroline: false,
+      gridcolor: "#D0D0D0",
+      rangemode: "tozero",
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
+      tickfont: {
+        size: 12,
+        color: "black",
+      },
+    },
+    yaxis: {
+      range: [-250, 250],
+      tick0: 0,
+      autotick: false,
+      dtick: 50,
+      gridcolor: "D0D0D0",
+      zeroline: false,
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
+      tickfont: {
+        size: 12,
+        color: "black",
+      },
+    },
+    titlefont: {
+      size: 16,
+      family: "Arial",
+      color: "black",
+    },
+  };
+  // var config = {
+  //   shapePosition = true
+  // },
+  layout_0 = {
+    title: {
+      text: "<b>velocity <i>v /</i> m s<sup>–1</sup></b>",
+      x: 0.54,
+      xanchor: "right",
+      y: 0.96,
+      yanchor: "top",
+    },
+    showlegend: false,
+    paper_bgcolor: "rgba(0,0,0,0)",
+    bordercolor: "rgb(0, 0, 0)",
+    dragmode: false,
+    hovermode: false,
+    draggableY: true,
+    //plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: {
+      l: 35,
+      r: 20,
+      b: 20,
+      t: 32,
+    },
+    xaxis: {
+      tickmode: "linear", //  If "linear", the placement of the ticks is determined by a starting position `tick0` and a tick step `dtick`
+      range: [0, 16],
+      tick0: 0,
+      autotick: false,
+      dtick: 4,
+      zeroline: false,
+      gridcolor: "D0D0D0",
+      rangemode: "tozero",
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
+      tickfont: {
+        size: 12,
+        color: "black",
+      },
+    },
+    yaxis: {
+      tickmode: "linear", //  If "linear", the placement of the ticks is determined by a starting position `tick0` and a tick step `dtick`
+      range: [-40, 40],
+      tick0: 0,
+      autotick: false,
+      dtick: 10,
+      zeroline: false,
+      gridcolor: "D0D0D0",
+      draggableY: true,
+      linecolor: "black",
+
+      linewidth: 2,
+      mirror: true,
+      tickfont: {
+        size: 12,
+        color: "black",
+      },
+    },
+    titlefont: {
+      size: 16,
+      family: "Arial",
+      color: "black",
+    },
+  };
+
+  layout_1 = {
+    title: {
+      text: "<b>acceleration <i>a /</i> m s<sup>–2</sup></b>",
+      x: 0.62,
+      xanchor: "right",
+      y: 0.96,
+      yanchor: "top",
+    },
+    showlegend: false,
+    paper_bgcolor: "rgba(0,0,0,0)",
+    bordercolor: "rgb(0, 0, 0)",
+    dragmode: false,
+    hovermode: false,
+    //plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: {
+      l: 25,
+      r: 20,
+      b: 20,
+      t: 32,
+    },
+    xaxis: {
+      tickmode: "linear", //  If "linear", the placement of the ticks is determined by a starting position `tick0` and a tick step `dtick`
+      range: [0, 16],
+      tick0: 0,
+      autotick: false,
+      dtick: 4,
+      zeroline: false,
+      gridcolor: "D0D0D0",
+      rangemode: "tozero",
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
+      tickfont: {
+        size: 12,
+        color: "black",
+      },
+    },
+    yaxis: {
+      tickmode: "linear", //  If "linear", the placement of the ticks is determined by a starting position `tick0` and a tick step `dtick`
+      range: [-4, 4],
+      tick0: 0,
+      autotick: false,
+      dtick: 1,
+      zeroline: false,
+      gridcolor: "D0D0D0",
+      linecolor: "black",
+      linewidth: 2,
+      mirror: true,
+      tickfont: {
+        size: 12,
+        color: "black",
+      },
+    },
+    titlefont: {
+      size: 16,
+      family: "Arial",
+      color: "black",
+    },
+  };
+
+  Plotly.plot(
+    "myDiv0",
+    [
+      {
+        y: [0],
+        x: [0],
+        type: "line",
+        line: {
+          color: "rgb(0, 0, 255)",
+          width: 4,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+      {
+        y: [0],
+        x: [0],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 4,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout,
+
+    { displayModeBar: false, doubleClick: false }
+  );
+
+  Plotly.plot(
+    "myDiv1",
+    [
+      {
+        y: [null],
+        x: [null],
+        draggableY: true,
+        type: "line",
+        line: {
+          color: "blue",
+          width: 4,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 4,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout_0,
+    //config,
+    //data ,
+    { displayModeBar: false, doubleClick: false }
+  );
+
+  Plotly.plot(
+    "myDiv2",
+    [
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "blue",
+          width: 4,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 4,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout_1,
+    { displayModeBar: false, doubleClick: false }
+  );
+
+  sliderNew = document.getElementById("rangeVal");
+  document.getElementById("point").innerHTML = sliderNew.value;
+  sliderNew.oninput = function () {
+    newLine[0] = this.value;
+    var top = sliderNew.value * -3.12 + 15;
+    if (top > 110) {
+      top = 110;
+    }
+    document.getElementsByClassName("textLable")[0].style.top = top + "px";
+    setGraphValue();
+    removeLabel();
+    if(sliderNew.value<0)
+    {
+      document.getElementById("point").innerHTML = "–"+ Math.abs(sliderNew.value);
+    }
+    else
+    {
+      document.getElementById("point").innerHTML = sliderNew.value;
+
+    }
+    slider.value = sliderNew.value;
+    document.getElementById(
+      "velcityValue"
+    ).innerHTML = ` <b> ${slider.value} &nbsp;&nbsp;m s<sup>–1</sup> </b>`;
+    //console.log(newLine);
+  };
+  sliderNew1 = document.getElementById("rangeVal1");
+  document.getElementById("point1").innerHTML = sliderNew1.value;
+  sliderNew1.oninput = function () {
+    newLine[1] = this.value;
+    var top1 = sliderNew1.value * -3.12 + 15;
+    if (top1 > 110) {
+      top1 = 110;
+    }
+    document.getElementsByClassName("textLable1")[0].style.top = top1 + "px";
+    setGraphValue();
+    removeLabel();
+    if(sliderNew1.value<0)
+    {
+      document.getElementById("point1").innerHTML = "–"+ Math.abs(sliderNew1.value);
+    }
+    else
+    {
+      document.getElementById("point1").innerHTML = sliderNew1.value;
+
+    }
+
+  };
+  sliderNew2 = document.getElementById("rangeVal2");
+  document.getElementById("point2").innerHTML = sliderNew2.value;
+  sliderNew2.oninput = function () {
+    newLine[2] = this.value;
+    var top2 = sliderNew2.value * -3.12 + 15;
+    if (top2 > 110) {
+      top2 = 110;
+    }
+    document.getElementsByClassName("textLable2")[0].style.top = top2 + "px";
+    setGraphValue();
+    removeLabel();
+    if(sliderNew2.value<0)
+    {
+      document.getElementById("point2").innerHTML = "–"+ Math.abs(sliderNew2.value);
+    }
+    else
+    {
+      document.getElementById("point2").innerHTML = sliderNew2.value;
+
+    }
+
+  };
+  sliderNew3 = document.getElementById("rangeVal3");
+  document.getElementById("point3").innerHTML = sliderNew3.value;
+  sliderNew3.oninput = function () {
+    newLine[3] = this.value;
+    var top3 = sliderNew3.value * -3.12 + 15;
+    if (top3 > 110) {
+      top3 = 110;
+    }
+    document.getElementsByClassName("textLable3")[0].style.top = top3 + "px";
+    setGraphValue();
+    removeLabel();
+    if(sliderNew3.value<0)
+    {
+      document.getElementById("point3").innerHTML = "–"+ Math.abs(sliderNew3.value);
+    }
+    else
+    {
+      document.getElementById("point3").innerHTML = sliderNew3.value;
+
+    }
+
+  };
+  sliderNew4 = document.getElementById("rangeVal4");
+  document.getElementById("point4").innerHTML = sliderNew4.value;
+  sliderNew4.oninput = function () {
+    newLine[4] = this.value;
+    var top4 = sliderNew4.value * -3.14 + 15;
+    if (top4 > 110) {
+      top4 = 110;
+    }
+    document.getElementsByClassName("textLable4")[0].style.top = top4 + "px";
+    setGraphValue();
+    removeLabel();
+    if(sliderNew4.value<0)
+    {
+      document.getElementById("point4").innerHTML = "–"+ Math.abs(sliderNew4.value);
+    }
+    else
+    {
+      document.getElementById("point4").innerHTML = sliderNew4.value;
+
+    }
+
+  };
+
+  slider.oninput = function () {
+    if (slider.value >= 0) {
+      output.innerHTML = ` <b> ${this.value}  m s<sup>–1</sup> </b>`;
+    } else if (slider.value < 0) {
+      output.innerHTML = ` <b> –${Math.abs(this.value)}  m s<sup>–1<sup> </b>`;
+    }
+
+    changeGraphLineValue(this.value);
+    initialCarState.velocity = this.value;
+
+    if (isNotChecked) {
+      if (dropDownValue === "increase" && this.value >= 8) {
+        $("#slide1").val(8);
+        output.innerHTML = ` <b> 8 m s<sup>–1</sup> </b>`;
+        changeGraphLineValue(8);
+        initialCarState.velocity = 8;
+      }
+      if (dropDownValue === "decrease" && this.value <= -8) {
+        $("#slide1").val(-8);
+        output.innerHTML = ` <b> –8 m s<sup>–1</sup> </b>`;
+        changeGraphLineValue(-8);
+        initialCarState.velocity = -8;
+      }
+    }
+  };
+}
+function removeLabel() {
+  document.getElementById(
+    "dropdownSelectedAccelerationValue"
+  ).innerHTML = `<b></b>`;
+  document.getElementById("dropdownSelectedValue").innerHTML = "";
+  $("#bt2").addClass("disabledDiv");
+}
+function onHoverIntro() {
+  $(".top-b").attr("src", "./Images/intro_btn_h.png");
+}
+
+function offHoverIntro() {
+  $(".top-b").attr("src", "./Images/intro_Btn.png");
+}
+
+function onHoverExe() {
+  $(".top-b1").attr("src", "./Images/Exre_btn.png");
+}
+
+function offHoverExe() {
+  $(".top-b1").attr("src", "./Images/Exercise_Btn.png");
+}
+
+function onHoverSave() {
+  $(".save").attr("src", "./Images/save_pink_btn.png");
+}
+
+function offHoverSave() {
+  $(".save").attr("src", "./Images/save_btn.png");
+}
+
+function onHoverReset() {
+  $(".reset").attr("src", "./Images/Reset.png");
+}
+
+function offHoverReset() {
+  $(".reset").attr("src", "./Images/Rest_btn.png");
+}
+
+function onHoverPlay() {
+  $(".Play").attr("src", "./Images/play_h.png");
+}
+
+function offHoverPlay() {
+  $(".Play").attr("src", "./Images/play_P.png");
+}
+
+function onHoverPause() {
+  $(".pause").attr("src", "./Images/pause_P.png");
+}
+
+function offHoverPause() {
+  $(".pause").attr("src", "./Images/Paus_btn.png");
+}
+
+function onHoverDrop() {
+  $(".dropdownBlink").attr("src", "./Images/B_btn1_h.png");
+}
+
+function offHoverDrop() {
+  $(".dropdownBlink").attr("src", "./Images/B_btn1.png");
+}
+function onHoverDrop2() {
+  $(".dropdownBlinkNew").attr("src", "./Images/B_btn1_h.png");
+}
+function offHoverDrop2() {
+  $(".dropdownBlinkNew").attr("src", "./Images/B_btn1.png");
+}
+
+function onHoverpopup() {
+  $(".pop").attr("src", "./Images/popup_close.png");
+}
+function offHoverpopup() {
+  $(".pop").attr("src", "./Images/popup.png");
+}
+
+var Start;
+var interValSteps = 0;
+let accelerationValues = {
+  uniform: [
+    { label: "0", value: 0 },
+    { label: "0", value: 0 },
+  ],
+  increase: [
+    { label: "1", value: 1 },
+    { label: "2", value: 2 },
+  ],
+  decrease: [
+    { label: "–1", value: -1 },
+    { label: "–2", value: -2 },
+  ],
+};
+
+var pauseGraph = false;
+let initialCarState = {
+  acceleration: 0,
+  time: 0,
+  velocity: 16,
+  velocityFinal: 0,
+  displacement: 0,
+};
+
+let time = initialCarState.time;
+let velocity = parseInt(initialCarState.velocity);
+let acceleration = initialCarState.acceleration;
+let displacement = initialCarState.displacement;
+
+//Dropdown menus motions
+function setDropdownValue(label, listValue) {
+  dropDownValue = listValue;
+  dropDownValueLable = label;
+  document.getElementById(
+    "dropdownSelectedValue"
+  ).innerHTML = `<b>${label}</b>`;
+  if (listValue === "uniform") {
+    newLine = [16, 16, 16, 16, 16];
+    slider.value = 16;
+  } else if (listValue === "increase") {
+    newLine = [0, 8, 16, 24, 32];
+    slider.value = 0;
+  } else if (listValue === "decrease") {
+    newLine = [32, 24, 16, 8, 0];
+    slider.value = 32;
+  }
+  document.getElementById("closeDrop1").classList.remove("show");
+  output.innerHTML = `<b> ${slider.value}  m s<sup>–1</sup> </b>`;
+  initialCarState.velocity = slider.value;
+  plotY = getY();
+  plotY.set(newLine);
+  // setGraphValue();
+  changeAccelarationDropdown(listValue);
+  //console.log(label);
+  if (isNotChecked) {
+    if (!saved) {
+      resetGraphs();
+      document.getElementById("graphHide").classList.remove("hideThis");
+    } else {
+      resetVelocityGraph();
+    }
+    setGraphValue();
+    updateSlider(newLine);
+  }
+  if (listValue !== "uniform") {
+    $("#bt2").removeClass("disabledDiv");
+  } else {
+    $("#bt2").addClass("disabledDiv");
+  }
+  if (listValue === "increase") {
+    slider.value = 0;
+  }
+  if (listValue === "decrease") {
+    slider.value = 32;
+  }
+  if (listValue === "uniform") {
+    slider.value = 16;
+  }
+}
+
+//Dropdown menus acceleration
+function setDropdownAccelerationValue(label) {
+  if (label < 0) {
+    document.getElementById(
+      "dropdownSelectedAccelerationValue"
+    ).innerHTML = `<b>–${Math.abs(label)}</b>`;
+  } else {
+    document.getElementById(
+      "dropdownSelectedAccelerationValue"
+    ).innerHTML = `<b>${label}</b>`;
+  }
+
+  document.getElementById("dropDownAcceleration").classList.remove("show");
+  initialCarState.acceleration = label;
+  if (label < 0) {
+    $("#acc").text(`–${Math.abs(label.toFixed(1))}`);
+  } else {
+    $("#acc").text(label.toFixed(1));
+  }
+
+  //console.log(initialCarState.acceleration)
+  if (initialCarState.acceleration === 1) {
+    newLine = [0, 4, 8, 12, 16];
+  } else if (initialCarState.acceleration === 2) {
+    newLine = [0, 8, 16, 24, 32];
+  } else if (label === -1) {
+    newLine = [32, 28, 24, 20, 16];
+  } else if (label === -2) {
+    newLine = [32, 24, 16, 8, 0];
+  }
+  plotY = getY();
+  plotY.set(newLine);
+  output.innerHTML = ` <b> ${slider.value}  m s<sup>–1</sup> </b>`;
+  initialCarState.velocity = slider.value;
+  if (isNotChecked) {
+    if (!saved) {
+      resetGraphs();
+      document.getElementById("graphHide").classList.remove("hideThis");
+    } else if (saved) {
+      resetVelocityGraph();
+    }
+    setGraphValue();
+    updateSlider(newLine);
+  }
+  const val = $("#dropdownSelectedValue").html();
+  if (
+    val === "<b>uniformly accelerated motion (a &gt; 0)</b>" ||
+    val === "<b>uniformly accelerated motion (a &lt; 0)</b>"
+  ) {
+    setTimeout(() => {
+      document.getElementById("bt2").classList.remove("disabledDiv");
+    }, 100);
+  }
+}
+
+function changeAccelarationDropdown(value) {
+  document.getElementById("dropDownAcceleration").innerHTML = null;
+  let requiredArray = accelerationValues[value];
+  if (requiredArray[1].value < 0) {
+    $("#acc").text(`–${Math.abs(requiredArray[1].value.toFixed(1))}`);
+  } else {
+    $("#acc").text(requiredArray[1].value.toFixed(1));
+  }
+
+  requiredArray.forEach((element) => {
+    if (element.value == 0) {
+      document.getElementById("bt2").classList.add("disabledDiv");
+    } else {
+      document.getElementById("bt2").classList.remove("disabledDiv");
+      document.getElementById(
+        "dropDownAcceleration"
+      ).innerHTML += `<li class="customList" onclick="setDropdownAccelerationValue (${element.value})">
+     ${element.label}
+    </li>`;
+    }
+  });
+  document.getElementById(
+    "dropdownSelectedAccelerationValue"
+  ).innerHTML = `<b>${requiredArray[1].label}</b>`;
+
+  // Getting "a" [acceleration]
+  initialCarState.acceleration = requiredArray[1].value;
+}
+
+$(function () {
+  $("[tabindex]").focus(function () {
+    $(this).click();
+  });
+});
+
+// introduction button
+function openIntroduction() {
+  document.getElementById("dialogIntro").classList.remove("hideThis");
+}
+function closeIntroduction() {
+  document.getElementById("dialogIntro").classList.add("hideThis");
+}
+
+let changedObject = {
+  acceleration: [],
+  time: [],
+  velocity: [],
+  displacement: [],
+  displacementRed: [],
+  timeRed: [],
+  accelerationRed: [],
+  velocityRed: [],
+};
+//start button
+function startAnimation() {
+  if (!saved) {
+    if (!pauseGraph) {
+      time = 0;
+      resetGraphs();
+      resetDot();
+      if (isNotChecked) {
+        setGraphValue();
+        document.getElementById("graphHide").classList.remove("hideThis");
+      }
+      clearInterval(Start);
+    }
+  } else if (saved) {
+    if (!pauseGraph) {
+      if (redDotPlotted) {
+        resetGraphs();
+        changedObject.displacementRed = [];
+        changedObject.velocityRed = [];
+        changedObject.accelerationRed = [];
+        changedObject.timeRed = [];
+        changeDisplacementGraphLimit(
+          +changedObject.displacement[changedObject.displacement.length - 1]
+        );
+        changeAccelerationGraphLimit(
+          +changedObject.acceleration[changedObject.acceleration.length - 1]
+        );
+        changeVelocityGraphLimit(
+          +changedObject.velocity[changedObject.velocity.length - 1]
+        );
+        setOpacity();
+        resetDot();
+        if (isNotChecked) {
+          setGraphValue();
+          document.getElementById("graphHide").classList.remove("hideThis");
+        }
+      }
+      redDotPlotted = true;
+      time = 0;
+      clearInterval(Start);
+    }
+  }
+  setDot(0, "start");
+  pauseGraph = false;
+  clearInterval(Start);
+  Start = setInterval(start, 50);
+}
+var displacement1 = 0;
+var displacement2 = 0;
+var displacement3 = 0;
+function start() {
+  document.getElementById("play").classList.add("hideThis");
+  document.getElementById("pause").classList.remove("hideThis");
+  document.getElementById("reset1").classList.remove("disabledDiv");
+  document.getElementById("slide1").classList.add("disabledDiv");
+  document.getElementById("bt1").classList.add("disabledDiv");
+  document.getElementById("bt2").classList.add("disabledDiv");
+  document.getElementById("ch1").classList.add("disabledDiv");
+  document.getElementById("save1").classList.add("disabledDiv");
+  $(".sliderGraph").addClass("disabledSlider");
+
+  time += 0.05;
+  time = Math.round(time * 100) / 100;
+  if (time >= 16) {
+    // document.getElementById("arrow1").classList.add("hideThis");
+    // document.getElementById("arrow2").classList.add("hideThis");
+    document.getElementById("play").classList.remove("hideThis");
+    document.getElementById("pause").classList.add("hideThis");
+    setDot(displacementValue, "final");
+    if (!saved) {
+      document.getElementById("save1").classList.remove("disabledDiv");
+    }
+
+    //console.log(changedObject);
+    clearInterval(Start);
+  }
+  // console.log(time);
+  acceleration = initialCarState.acceleration;
+  velocityInitial = parseInt(initialCarState.velocity);
+  interValSteps++;
+  if (isNotChecked) {
+    var difference;
+    if (time >= 0 && time <= 4) {
+      initialCarState.velocity = newLine[0];
+      difference = newLine[1] - newLine[0];
+      acceleration = difference / 4;
+      velocityFinal = +initialCarState.velocity + acceleration * time;
+      velocityInitial = +initialCarState.velocity;
+      displacementValue =
+        velocityInitial * time + (acceleration / 2) * time * time;
+      displacement1 = velocityInitial * time + (acceleration / 2) * time * time;
+    } else if (time > 4 && time <= 8) {
+      initialCarState.velocity = newLine[1];
+      difference = newLine[2] - newLine[1];
+      acceleration = difference / 4;
+      velocityFinal = +initialCarState.velocity + acceleration * (time - 4);
+      velocityInitial = +initialCarState.velocity;
+      displacementValue =
+        displacement1 +
+        velocityInitial * (time - 4) +
+        (acceleration / 2) * (time - 4) * (time - 4);
+      displacement2 =
+        displacement1 +
+        velocityInitial * (time - 4) +
+        (acceleration / 2) * (time - 4) * (time - 4);
+    } else if (time > 8 && time <= 12) {
+      initialCarState.velocity = newLine[2];
+      difference = newLine[3] - newLine[2];
+      acceleration = difference / 4;
+      velocityFinal = +initialCarState.velocity + acceleration * (time - 8);
+      velocityInitial = +initialCarState.velocity;
+      displacementValue =
+        displacement2 +
+        velocityInitial * (time - 8) +
+        (acceleration / 2) * (time - 8) * (time - 8);
+      displacement3 =
+        displacement2 +
+        velocityInitial * (time - 8) +
+        (acceleration / 2) * (time - 8) * (time - 8);
+    } else if (time > 12 && time <= 16) {
+      initialCarState.velocity = newLine[3];
+      difference = newLine[4] - newLine[3];
+      acceleration = difference / 4;
+      velocityFinal = +initialCarState.velocity + acceleration * (time - 12);
+      velocityInitial = +initialCarState.velocity;
+      displacementValue =
+        displacement3 +
+        velocityInitial * (time - 12) +
+        (acceleration / 2) * (time - 12) * (time - 12);
+    }
+  } else {
+    velocityFinal = velocityInitial + acceleration * time;
+    displacementValue =
+      velocityInitial * time + (acceleration * time * time) / 2;
+  }
+  // console.log(" animation Playing time ", time);
+  // console.log(" animation Playing velocityFinal ", velocityFinal);
+  // console.log(" animation Playing displacementValue ", displacementValue);
+
+  setTime(time);
+  setVelocity(velocityFinal);
+  setAcceleration(acceleration);
+  setDisplacement(displacementValue);
+  changeDisplacementGraphLimit(displacementValue);
+  changeAccelerationGraphLimit(acceleration);
+  setDot(displacementValue, "start");
+  setArrow(displacementValue);
+  moveCar(displacementValue);
+  if (isNotChecked == false) {
+    changeVelocityGraphLimit(velocityFinal);
+  }
+  extendGraph();
+
+  function setTime(time) {
+    let timeToDisplay = time.toFixed(1);
+    if (!saved) {
+      changedObject.time.push(time);
+    } else {
+      changedObject.timeRed.push(time);
+    }
+    document.getElementById("timerun").innerHTML = timeToDisplay;
+  }
+
+  function extendGraph() {
+    if (saved) {
+      Plotly.extendTraces(
+        "myDiv0",
+        {
+          y: [[null], [getLatestDisp()]],
+          x: [[null], [getLatestTime()]],
+        },
+        [0, 1]
+      );
+      Plotly.extendTraces(
+        "myDiv1",
+        {
+          y: [[null], [getLatestVelocity()]],
+          x: [[null], [getLatestTime()]],
+        },
+        [0, 1]
+      );
+      Plotly.extendTraces(
+        "myDiv2",
+        {
+          y: [[null], [getLatestAcceleration()]],
+          x: [[null], [getLatestTime()]],
+        },
+        [0, 1]
+      );
+    } else {
+      Plotly.extendTraces(
+        "myDiv0",
+        {
+          y: [[getLatestDisp()]],
+          x: [[getLatestTime()]],
+        },
+        [0]
+      );
+      Plotly.extendTraces(
+        "myDiv1",
+        { y: [[getLatestVelocity()]], x: [[getLatestTime()]] },
+        [0]
+      );
+      Plotly.extendTraces(
+        "myDiv2",
+        { y: [[getLatestAcceleration()]], x: [[getLatestTime()]] },
+        [0]
+      );
+    }
+  }
+}
+/////////////////////////////////////////////////
+
+function setVelocity(velocity) {
+  let velocityToDisplay = velocity.toFixed(1);
+  if (!saved) {
+    changedObject.velocity.push(velocityToDisplay);
+  } else {
+    changedObject.velocityRed.push(velocityToDisplay);
+  }
+  if (velocity < 0) {
+    document.getElementById("vel").innerHTML = `–${Math.abs(
+      velocityToDisplay
+    )}`;
+  } else {
+    document.getElementById("vel").innerHTML = velocityToDisplay;
+  }
+
+  // document.getElementById("vel").innerHTML = velocityToDisplay;
+
+  $("#arrowLine").css("width", velocityToDisplay * 2 + "px");
+  $("#arrowBackLine").css("width", Math.abs(velocityToDisplay) * 2 + "px");
+}
+
+function setAcceleration(acceleration) {
+  let accelerationToDisplay = acceleration;
+  if (!saved) {
+    changedObject.acceleration.push(accelerationToDisplay);
+  } else {
+    changedObject.accelerationRed.push(accelerationToDisplay);
+  }
+  if (acceleration < 0) {
+    document.getElementById("acc").innerHTML = `–${Math.abs(
+      accelerationToDisplay.toFixed(1)
+    )}`;
+  } else {
+    document.getElementById("acc").innerHTML = accelerationToDisplay.toFixed(1);
+  }
+
+  //console.log( "array: ", changedObject.acceleration)
+  if (acceleration == 0) {
+    document.getElementById("arrow1").classList.add("hideThis");
+    document.getElementById("arrow2").classList.add("hideThis");
+  }
+}
+
+function setDisplacement(displacementValue) {
+  let displacementValueToDisplay = displacementValue.toFixed(1);
+  if (!saved) {
+    changedObject.displacement.push(displacementValueToDisplay);
+  } else {
+    changedObject.displacementRed.push(displacementValueToDisplay);
+  }
+
+  if (displacementValue < 0) {
+    document.getElementById("disp").innerHTML = `–${Math.abs(
+      displacementValueToDisplay
+    )}`;
+  } else {
+    document.getElementById("disp").innerHTML = displacementValueToDisplay;
+  }
+
+  // document.getElementById("disp").innerHTML = displacementValueToDisplay;
+  //console.log(changedObject.displacement);
+}
+
+function moveCar(displacementValue) {
+  document.getElementsByClassName("car")[0].style.left =
+    59 + displacementValue * 3.46 + "px"; // 1m == 4.34px
+}
+
+function setDot(displacementValue, state) {
+  //console.log(initialCarState.velocity);
+  if (displacement < 257) {
+    if (state === "final") {
+      if (saved === true) {
+        document.getElementById(
+          "activity___top"
+        ).innerHTML += `   <img class="Reddot" src="./Images/red_dot.png" style="left:${
+          106 + displacementValue * 3.46
+        }px;">`;
+      } else {
+        document.getElementById(
+          "activity___top"
+        ).innerHTML += `   <img class="Bluedot" src="./Images/blue_dot.png" style="left:${
+          106 + displacementValue * 3.46
+        }px">`;
+      }
+    }
+    if (interValSteps % 20 == 0 && state === "start") {
+      document.getElementsByClassName("Bluedot")[0].style.left =
+        106 + displacementValue * 3.46 + "px"; // 1m == 4.34px
+
+      if (saved === true) {
+        document.getElementById(
+          "activity___top"
+        ).innerHTML += `   <img class="Reddot" src="./Images/red_dot.png" style="left:${
+          106 + displacementValue * 3.46
+        }px;">`;
+      } else {
+        document.getElementById(
+          "activity___top"
+        ).innerHTML += `   <img class="Bluedot" src="./Images/blue_dot.png" style="left:${
+          106 + displacementValue * 3.46
+        }px">`;
+      }
+    }
+  }
+}
+
+function changeVelocityGraphLimit(velocity) {
+  let velocityToDisplay;
+  if (velocity < 0) {
+    velocityToDisplay = (velocity - 5).toFixed(1);
+  } else {
+    velocityToDisplay = (velocity + 5).toFixed(1);
+  }
+  if (dropDownValue === "uniform") {
+    if (velocity > 40 || velocity < -40) {
+      if (layout_0.yaxis.range[1] < Math.abs(velocityToDisplay)) {
+        layout_0.yaxis.range[0] = -Math.abs(velocityToDisplay);
+        layout_0.yaxis.range[1] = Math.abs(velocityToDisplay);
+        layout_0.yaxis.dtick = 10;
+      }
+    }
+    if (velocity > 60 || velocity < -60) {
+      layout_0.yaxis.range[0] = -Math.abs(80);
+      layout_0.yaxis.range[1] = 80;
+    }
+  } else {
+    if (velocity > 30 || velocity < -30) {
+      if (layout_0.yaxis.range[1] < Math.abs(velocityToDisplay)) {
+        layout_0.yaxis.range[0] = -Math.abs(velocityToDisplay);
+        layout_0.yaxis.range[1] = Math.abs(velocityToDisplay);
+        layout_0.yaxis.dtick = 10;
+      }
+    }
+    if (velocity > 60 || velocity < -60) {
+      layout_0.yaxis.range[0] = -Math.abs(80);
+      layout_0.yaxis.range[1] = 80;
+    }
+  }
+}
+
+function changeDisplacementGraphLimit(displacementValue) {
+  let displacementValueToDisplay;
+  if (displacementValue < 0) {
+    displacementValueToDisplay = (displacementValue - 30).toFixed(1);
+  } else {
+    displacementValueToDisplay = (displacementValue + 30).toFixed(1);
+  }
+  if (displacementValue > 210 || displacementValue < -200) {
+    if (layout.yaxis.range[1] < Math.abs(displacementValueToDisplay)) {
+      layout.yaxis.range[0] = -Math.abs(displacementValueToDisplay);
+      layout.yaxis.range[1] = Math.abs(displacementValueToDisplay);
+    }
+  }
+  if (displacementValue > 380 || displacementValue < -380) {
+    layout.yaxis.dtick = 100;
+  }
+  if (displacementValue > 630 || displacementValue < -630) {
+    layout.yaxis.dtick = 200;
+  }
+}
+
+function changeAccelerationGraphLimit(acceleration) {
+  let accelerationToDisplay;
+  if (acceleration < 0) {
+    accelerationToDisplay = (acceleration - 1.5).toFixed(1);
+  } else {
+    accelerationToDisplay = (acceleration + 1.5).toFixed(1);
+  }
+
+  if (acceleration > 3.9 || acceleration < -3.9) {
+    // console.log("accelerationToDisplay ", accelerationToDisplay);
+    if (layout_1.yaxis.range[1] < Math.abs(accelerationToDisplay)) {
+      layout_1.yaxis.range[0] = -Math.abs(accelerationToDisplay);
+      layout_1.yaxis.range[1] = Math.abs(accelerationToDisplay);
+    }
+  }
+  if (acceleration > 10 || acceleration < -10) {
+    layout_1.yaxis.dtick = 2;
+  }
+  if (acceleration > 14 || acceleration < -14) {
+    layout_1.yaxis.dtick = 5;
+  }
+}
+
+function setArrow(displacementValue) {
+  if (velocityFinal < 0) {
+    document.getElementById("arrow2").classList.remove("hideThis");
+    document.getElementById("arrow1").classList.add("hideThis");
+  } else if (velocityFinal > 0) {
+    document.getElementById("arrow1").classList.remove("hideThis");
+    document.getElementById("arrow2").classList.add("hideThis");
+  } else if (velocityFinal === 0) {
+    document.getElementById("arrow1").classList.add("hideThis");
+    document.getElementById("arrow2").classList.add("hideThis");
+  }
+  document.getElementById("arrow1").style.left =
+    113 + displacementValue * 3.46 + "px"; // 1m == 4.34px
+
+  document.getElementById("arrow2").style.left =
+    60 + displacementValue * 3.46 + "px"; // 1m == 4.34px
+}
+
+function pause() {
+  document.getElementById("play").classList.remove("hideThis");
+  document.getElementById("pause").classList.add("hideThis");
+  clearInterval(Start);
+  pauseGraph = true;
+
+  // initialCarState.acceleration =
+  //   changedObject.acceleration[changedObject.acceleration.length - 1];
+  // initialCarState.time = changedObject.time[changedObject.time.length - 1];
+  // initialCarState.velocity =
+  //   changedObject.velocity[changedObject.velocity.length - 1];
+  // initialCarState.displacement =
+  //   changedObject.displacement[changedObject.displacement.length - 1];
+}
+
+// customizes Vt Graph....................................
+
+function getY() {
+  var y = [];
+  return {
+    get: function () {
+      return y;
+    },
+    set: function (newArr) {
+      y = newArr;
+    },
+  };
+}
+
+function setGraphValue() {
+  Plotly.addTraces("myDiv1", {
+    x: [0, 4, 8, 12, 16],
+    y: plotY.get(),
+    mode: "lines+text",
+    name: "Lines and Text",
+    // text: [newLine[0], newLine[1], newLine[2], newLine[3], newLine[4]],
+    textposition: "bottom",
+    line: {
+      color: "black",
+      width: 1,
+    },
+    type: "scatter",
+  });
+}
+
+function changeGraphLineValue(linePoint) {
+  if (isNotChecked) {
+    const val = $("#dropdownSelectedValue").html();
+    if (dropDownValue === "uniform") {
+      newLine[0] = linePoint;
+      if (val !== "") {
+        newLine[1] = linePoint;
+        newLine[2] = linePoint;
+        newLine[3] = linePoint;
+        newLine[4] = linePoint;
+      }
+    } else if (dropDownValue === "increase" && linePoint <= 8) {
+      newLine[0] = linePoint;
+      if (val !== "") {
+        newLine[1] = parseInt(linePoint) + 8;
+        newLine[2] = parseInt(linePoint) + 16;
+        newLine[3] = parseInt(linePoint) + 24;
+        newLine[4] = parseInt(linePoint) + 32;
+      }
+    } else if (dropDownValue === "decrease" && linePoint >= -8) {
+      newLine[0] = linePoint;
+      if (val !== "") {
+        newLine[1] = parseInt(linePoint) - 8;
+        newLine[2] = parseInt(linePoint) - 16;
+        newLine[3] = parseInt(linePoint) - 24;
+        newLine[4] = parseInt(linePoint) - 32;
+      }
+    }
+    plotY.set(newLine);
+    setGraphValue();
+    updateSlider(newLine);
+  }
+}
+
+function checkboxShow() {
+  $("img.checked").toggleClass("unchecked");
+  isNotChecked = document.getElementById("ch1").classList.contains("unchecked");
+
+  if (isNotChecked) {
+    document.getElementById("graphHide").classList.remove("hideThis");
+    setGraphValue();
+    updateSlider(newLine);
+  } else if (!isNotChecked) {
+    if (!$("#dropdownSelectedValue").html()) {
+      setDropdownValue("uniform motion", "uniform");
+    }
+    resetGraphs();
+  }
+}
+
+function getLatestVelocity() {
+  if (!saved) {
+    return changedObject.velocity[changedObject.velocity.length - 1];
+  } else {
+    return changedObject.velocityRed[changedObject.velocityRed.length - 1];
+  }
+}
+
+function getLatestTime() {
+  if (!saved) {
+    return changedObject.time[changedObject.time.length - 1];
+  } else {
+    return changedObject.timeRed[changedObject.timeRed.length - 1];
+  }
+}
+
+function getLatestDisp() {
+  if (!saved) {
+    return changedObject.displacement[changedObject.displacement.length - 1];
+  } else {
+    return changedObject.displacementRed[
+      changedObject.displacementRed.length - 1
+    ];
+  }
+}
+
+function getLatestAcceleration() {
+  if (!saved) {
+    return changedObject.acceleration[changedObject.acceleration.length - 1];
+  } else {
+    return changedObject.accelerationRed[
+      changedObject.accelerationRed.length - 1
+    ];
+  }
+}
+
+//rest button
+function resettwo() {
+  setGraphValue();
+  resetCarImage();
+}
+
+function resetAll(value) {
+  // checkboxShow();
+  $(".sliderGraph").removeClass("disabledSlider");
+  $("#save1").addClass("disabledDiv");
+  document.getElementById("a2").classList.add("disabledDiv");
+  if (!saved) {
+    setDropdownValue(dropDownValueLable, dropDownValue);
+    resetAcccDropdown();
+  }
+  if (value === "reset") {
+    saved = false;
+    redDotPlotted = false;
+    resetDot();
+    resetGraphs();
+  }
+  resetValues();
+  resetButtons();
+  if (isNotChecked) {
+    setGraphValue();
+    document.getElementById("graphHide").classList.remove("hideThis");
+    updateSlider(newLine);
+  }
+  const val = $("#dropdownSelectedValue").html();
+  if (val !== "") {
+    if (dropDownValue === "uniform") {
+      slider.value = 16;
+      output.innerHTML = ` <b> ${slider.value}  m s<sup>–1</sup> </b>`;
+    }
+    if (dropDownValue === "increase") {
+      slider.value = 0;
+      output.innerHTML = ` <b> ${slider.value}  m s<sup>–1</sup> </b>`;
+    }
+    if (dropDownValue === "decrease") {
+      slider.value = 32;
+      output.innerHTML = ` <b> ${slider.value}  m s<sup>–1</sup> </b>`;
+    }
+  }
+}
+
+function resetDot() {
+  if (!saved) {
+    document.getElementById(
+      "activity___top"
+    ).innerHTML = `<img src="./Images/scene.jpg" style="width: 100%; border-radius:10px; ">
+    <div class="activity_topdetails">
+        <b>
+            <p id="tim">time <i>t</i> = <span id="timerun">0.0</span> s &nbsp;&nbsp;</p>
+        </b>
+        <b>
+            <p>displacement <i>s</i> = <span id="disp">0.0</span> m &nbsp;&nbsp;</p>
+        </b>
+        <b>
+            <p>velocity <i>v</i> = <span id="vel">0.0</span> m s<sup>–1</sup> &nbsp;&nbsp;</p>
+        </b>
+        <b>
+            <p>acceleration <i>a</i> = <span id="acc">0.0</span> m s<sup>–2</sup></p>
+        </b>
+    </div>
+    <img class="car" src="./Images/car.png">
+    <div id="arrow1" class="arrowNew hideThis">
+          <div id="arrowLine" class="line3"></div>
+          <div class="point3"></div>
+        </div>
+    <div id="arrow2" class="arrowNewBack hideThis">
+          <div id="arrowBackLine" class="line32"></div>
+          <div class="point32"></div>
+        </div>
+    <img id="a2" class="Bluedot hideThis" src="./Images/blue_dot.png">`;
+  } else {
+    $(".Reddot").remove();
+  }
+}
+
+function resetGraphs() {
+  Plotly.purge("myDiv1");
+  Plotly.purge("myDiv2");
+  Plotly.purge("myDiv0");
+  initGraph(false);
+  document.getElementById("graphHide").classList.add("hideThis");
+}
+
+function resetCarImage() {
+  //console.log(document.getElementsByClassName("car")[0].style.left);
+  document.getElementsByClassName("car")[0].style.left = "59px"; // 1m == 4.34px
+
+  document.getElementsByClassName("Bluedot")[0].style.left = "106px";
+  document.getElementsByClassName("arrow")[0].style.left = "113px";
+}
+
+function resetValues(value) {
+  const val = $("#dropdownSelectedValue").html();
+  if (val === "<b>uniform motion</b>") {
+    initialCarState = {
+      acceleration: 0,
+      time: 0,
+      velocity: 16,
+      velocityFinal: 0,
+      displacement: 0,
+    };
+  } else if (val === "<b>uniformly accelerated motion (a &gt; 0)</b>") {
+    initialCarState = {
+      acceleration: 2,
+      time: 0,
+      velocity: 0,
+      velocityFinal: 0,
+      displacement: 0,
+    };
+  } else if (val === "<b>uniformly accelerated motion (a &lt; 0)</b>") {
+    initialCarState = {
+      acceleration: -2,
+      time: 0,
+      velocity: 32,
+      velocityFinal: 0,
+      displacement: 0,
+    };
+  }
+  if (!saved) {
+    changedObject = {
+      acceleration: [],
+      time: [],
+      velocity: [],
+      displacement: [],
+      accelerationRed: [],
+      timeRed: [],
+      velocityRed: [],
+      displacementRed: [],
+    };
+  }
+
+  // isNotChecked = false;
+  console.log(" initialCarState ", initialCarState);
+  clearInterval(Start);
+  interValSteps = 0;
+  velocityInitial = parseInt(initialCarState.velocity);
+  acceleration = initialCarState.acceleration;
+  velocityFinal = 0;
+
+  time = 0;
+}
+
+function resetButtons() {
+  document.getElementById("play").classList.remove("hideThis");
+  document.getElementById("pause").classList.add("hideThis");
+  document.getElementById("slide1").classList.remove("disabledDiv");
+  document.getElementById("bt1").classList.remove("disabledDiv");
+  const val = $("#dropdownSelectedValue").html();
+  if (
+    val === "<b>uniformly accelerated motion (a &gt; 0)</b>" ||
+    val === "<b>uniformly accelerated motion (a &lt; 0)</b>"
+  ) {
+    document.getElementById("bt2").classList.remove("disabledDiv");
+  }
+  document.getElementById("ch1").classList.remove("disabledDiv");
+  // document.getElementById("ch1").classList.add("checked");
+  if (saved === false) {
+    //document.getElementById("ch1").classList.remove("unchecked");
+    document.getElementById("reset1").classList.add("disabledDiv");
+  }
+}
+
+function resetAcccDropdown() {
+  if (dropDownValue === "increase") {
+    document.getElementById("acc").innerHTML = null;
+  }
+  if (dropDownValue === "decrease") {
+    document.getElementById("acc").innerHTML = null;
+  }
+}
+
+function updateSlider(value) {
+  var top, top1, top2, top3, top4;
+
+  top = value[0] * -3.12 + 15;
+  if (top > 110) {
+    top = 110;
+  }
+  top1 = value[1] * -3.12 + 15;
+  if (top1 > 110) {
+    top1 = 110;
+  }
+  top2 = value[2] * -3.12 + 15;
+  if (top2 > 110) {
+    top2 = 110;
+  }
+  top3 = value[3] * -3.12 + 15;
+  if (top3 > 110) {
+    top3 = 110;
+  }
+  top4 = value[4] * -3.12 + 15;
+  if (top4 > 110) {
+    top4 = 110;
+  }
+
+  sliderNew.value = value[0];
+  sliderNew1.value = value[1];
+  sliderNew2.value = value[2];
+  sliderNew3.value = value[3];
+  sliderNew4.value = value[4];
+
+  if (value[0] < 0) {
+    $("#point").text("–" + Math.abs(value[0]));
+  } else {
+    $("#point").text(value[0]);
+  }
+  if (value[1] < 0) {
+    $("#point1").text("–" + Math.abs(value[1]));
+  } else {
+    $("#point1").text(value[1]);
+  }
+  if (value[2] < 0) {
+    $("#point2").text("–" + Math.abs(value[2]));
+  } else {
+    $("#point2").text(value[2]);
+  }
+  if (value[3] < 0) {
+    $("#point3").text("–" + Math.abs(value[3]));
+  } else {
+    $("#point3").text(value[3]);
+  }
+  if (value[4] < 0) {
+    $("#point4").text("–" + Math.abs(value[4]));
+  } else {
+    $("#point4").text(value[4]);
+  }
+
+  $("#point").css("top", top + "px");
+  $("#point1").css("top", top1 + "px");
+  $("#point2").css("top", top2 + "px");
+  $("#point3").css("top", top3 + "px");
+  $("#point4").css("top", top4 + "px");
+}
+
+// save button
+function saveit() {
+  document.getElementById("save1").classList.add("disabledDiv");
+  $(".Bluedot").css("opacity", 0.3);
+  saved = true;
+  setOpacity();
+  resetAll();
+  document.getElementById("ch1").classList.add("disabledDiv");
+}
+function setOpacity() {
+  Plotly.react(
+    "myDiv0",
+    [
+      {
+        y: [0],
+        x: [0],
+        type: "line",
+        line: {
+          color: "rgba(0, 0, 255, 0.3)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+      {
+        y: [0],
+        x: [0],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout,
+
+    { displayModeBar: false, doubleClick: false }
+  );
+
+  Plotly.react(
+    "myDiv1",
+    [
+      {
+        y: [null],
+        x: [null],
+        draggableY: true,
+        type: "line",
+        line: {
+          color: "rgba(0, 0, 255, 0.3)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout_0,
+    //config,
+    //data ,
+    { displayModeBar: false, doubleClick: false }
+  );
+
+  Plotly.react(
+    "myDiv2",
+    [
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "rgba(0, 0, 255, 0.3)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout_1,
+    { displayModeBar: false, doubleClick: false }
+  );
+  for (i = 0; i < changedObject.displacement.length; i += 3) {
+    var d = changedObject.displacement[i];
+    var t = changedObject.time[i];
+    var v = changedObject.velocity[i];
+    var a = changedObject.acceleration[i];
+    Plotly.extendTraces(
+      "myDiv0",
+      {
+        y: [[d]],
+        x: [[t]],
+      },
+      [0]
+    );
+
+    Plotly.extendTraces(
+      "myDiv1",
+      {
+        y: [[v]],
+        x: [[t]],
+      },
+      [0]
+    );
+    Plotly.extendTraces(
+      "myDiv2",
+      {
+        y: [[a]],
+        x: [[t]],
+      },
+      [0]
+    );
+  }
+  Plotly.extendTraces(
+    "myDiv0",
+    {
+      y: [[getLatestDisp()]],
+      x: [[getLatestTime()]],
+    },
+    [0]
+  );
+  Plotly.extendTraces(
+    "myDiv1",
+    { y: [[getLatestVelocity()]], x: [[getLatestTime()]] },
+    [0]
+  );
+  Plotly.extendTraces(
+    "myDiv2",
+    { y: [[getLatestAcceleration()]], x: [[getLatestTime()]] },
+    [0]
+  );
+}
+
+function resetVelocityGraph() {
+  Plotly.react(
+    "myDiv1",
+    [
+      {
+        y: [null],
+        x: [null],
+        draggableY: true,
+        type: "line",
+        line: {
+          color: "rgba(0, 0, 255, 0.3)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+      {
+        y: [null],
+        x: [null],
+        type: "line",
+        line: {
+          color: "rgba(255, 0, 0, 0.6)",
+          width: 3,
+        },
+        marker: {
+          opacity: 0,
+        },
+      },
+    ],
+
+    layout_0,
+    //config,
+    //data ,
+    { displayModeBar: false, doubleClick: false }
+  );
+  for (i = 0; i < changedObject.velocity.length; i += 3) {
+    var t = changedObject.time[i];
+    var v = changedObject.velocity[i];
+    Plotly.extendTraces(
+      "myDiv1",
+      {
+        y: [[v]],
+        x: [[t]],
+      },
+      [0]
+    );
+  }
+  Plotly.extendTraces(
+    "myDiv1",
+    { y: [[getLatestVelocity()]], x: [[getLatestTime()]] },
+    [0]
+  );
+}
